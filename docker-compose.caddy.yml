@@ -1,0 +1,30 @@
+services:
+  caddy:
+    image: korewalidesu/caddy:latest
+    ports:
+      # Listen on port 80, default for HTTP, necessary to redirect to HTTPS
+      - 80:80
+      # Listen on port 443, default for HTTPS
+      - 443:443
+    restart: always
+    # environment:
+    #   - CADDY_INGRESS_NETWORKS=caddy
+    volumes:
+      # Add Docker as a mounted volume, so that Caddy can read the labels of other services
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Mount the volume to store the certificates
+      - caddy-data:/data
+    networks:
+      # Use the public network created to be shared between Caddy and
+      # any other service that needs to be publicly available with HTTPS
+      - caddy
+
+volumes:
+  # Create a volume to store the certificates, even if the container is recreated
+  caddy-data:
+
+networks:
+  # Use the previously created public network "caddy", shared with other
+  # services that need to be publicly available via this Caddy
+  caddy:
+    external: true

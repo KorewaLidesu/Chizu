@@ -1,0 +1,70 @@
+services:
+
+  proxy:
+    image: korewalidesu/caddy:latest
+    ports:
+      - 80:80
+      - 443:443
+    # environment:
+    #   - CADDY_INGRESS_NETWORKS=${DOMAIN?Variable not set}_caddy
+    networks:
+      - caddy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./proxy/config/:/config/caddy/
+      - ./proxy/data/:/data/caddy/
+    env_file:
+      - .env
+    build:
+      context: ./proxy
+    labels:
+      caddy: "*.${DOMAIN?Variable not set}"
+      caddy.tls: internal
+
+  db:
+    restart: "no"
+    ports:
+      - "5432:5432"
+
+  geoserver:
+    restart: "no"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./geoserver/data/:/opt/geoserver_data/
+    environment:
+      - SAMPLE_DATA=true
+
+  # pgadmin:
+  #   image: dpage/pgadmin4:latest
+  #   environment:
+  #     - PGADMIN_DEFAULT_EMAIL=li@hellparadise.jp.net
+  #     - PGADMIN_DEFAULT_PASSWORD=#Azusa_Aizawa
+  #   ports:
+  #     - "80"
+
+  backend:
+    restart: "no"
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./backend/:/app
+    build:
+      context: ./backend
+      args:
+        INSTALL_DEV: ${INSTALL_DEV-true}
+    # command: sleep infinity  # Infinite loop to keep container alive doing nothing
+    command: /start-reload.sh
+
+  frontend:
+    restart: "no"
+    build:
+      context: ./frontend
+      args:
+        - VITE_API_URL=http://${DOMAIN?Variable not set}
+        - NODE_ENV=development
+
+networks:
+  caddy:
+    # For local dev, don't expect an external Caddy network
+    external: false
