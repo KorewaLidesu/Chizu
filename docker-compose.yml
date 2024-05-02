@@ -61,6 +61,10 @@ services:
     networks:
       - caddy
       - default
+    build:
+      context: ./backend
+      args:
+        - NODE_ENV=production
     depends_on:
       - db
     env_file:
