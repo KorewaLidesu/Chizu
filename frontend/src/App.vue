@@ -1,11 +1,7 @@
+<script setup lang="ts"></script>
+
 <template>
   <v-app>
-    <v-main>
-      <HelloWorld />
-    </v-main>
+    <RouterView />
   </v-app>
 </template>
-
-<script setup lang="ts">
-  //
-</script>
