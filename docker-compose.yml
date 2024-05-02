@@ -61,10 +61,6 @@ services:
     networks:
       - caddy
       - default
-    build:
-      context: ./backend
-      args:
-        - NODE_ENV=production
     depends_on:
       - db
     env_file:
@@ -91,7 +87,7 @@ services:
     build:
       context: ./backend
       args:
-        INSTALL_DEV: ${INSTALL_DEV-false}
+        - NODE_ENV=production
     platform: linux/amd64 # Patch for M1 Mac
     labels:
       caddy: ${DOMAIN?Variable not set}
