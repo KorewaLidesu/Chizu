@@ -46,15 +46,11 @@ services:
   backend:
     restart: "no"
     ports:
-      - "8888:8888"
-    volumes:
-      - ./backend/:/app
+      - "3000:3000"
     build:
       context: ./backend
       args:
         - NODE_ENV=development
-    # command: sleep infinity  # Infinite loop to keep container alive doing nothing
-    command: /start-reload.sh
 
   frontend:
     restart: "no"
